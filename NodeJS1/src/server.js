@@ -13,12 +13,17 @@ app.set('view engine', 'ejs');
 
 //URL DE PAGINAS//
 app.get('/', (req, res) => {
-    res.render('index');
+    res.status(201).render('index');
 });
 
 //ACERCA DE 201//
 app.get('/app', (req, res) => {
     res.status(201).render('about');
+});
+
+//LOGIN//
+app.get('/login', (req, res) => {
+    res.status(201).render('login');
 });
 
 //ERROR 404//
@@ -27,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 //LEVANTAMOS EL SERVER//
-var server = app.listen(8080, function() {
+var server = app.listen(3000, function() {
     var host = server.address().address;
     var port = server.address().port;
 

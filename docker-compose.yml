@@ -1,0 +1,61 @@
+version: '3'
+services: 
+  api:
+    build:
+      dockerfile: DockerFile
+      context: ./api
+    volumes: 
+      - ./api/public:/app/public
+      - ./api/src:/app/src
+      - ./api/views:/app/views
+      - ./api/package.json:/app/package.json
+    links:
+      - redis
+    environment:
+    - REDIS_URL=redis://redisdb
+    #ports: 
+    #  - "3001:3001"
+  app:
+    stdin_open: true
+    build: 
+      dockerfile: DockerFile
+      context: ./NodeJS1
+    volumes: 
+      - ./NodeJS1/public:/app/public
+      - ./NodeJS1/src:/app/src
+      - ./NodeJS1/views:/app/views
+      - ./NodeJS1/package.json:/app/package.json
+    links:
+      - api
+    depends_on: 
+      - api
+    #ports: 
+    #  - "80:3000"
+  worker:
+    build: 
+      dockerfile: DockerFile
+      context: ./worker
+    volumes:
+      - ./worker/public:/app/public
+      - ./worker/src:/app/src
+    links:
+      - redis
+    environment:
+    - REDIS_URL=redis://redisdb
+      #- ./worker/package.json:app/package.json
+  redis:
+    image: redis
+    container_name: redisdb
+    expose:
+      - 6379
+  nginx:
+    depends_on: 
+      - app
+      - api
+      - worker
+    restart: always
+    build: 
+      dockerfile: DockerFile
+      context: ./nginx
+    ports: 
+      - "5000:5000"
